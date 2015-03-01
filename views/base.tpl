@@ -1,5 +1,5 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
-<html lang="en">
+<html lang="en" ng-app="turnoverSuncor">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     {% block head %}
@@ -35,7 +35,7 @@
       <footer class="footer">
           {% block footer %}
           <div class="pull-right">
-            &copy; Copyright 2015 by <a href="http://goo.gl/mdFz56">Alonso Suarez</a>.
+            Developed by <a href="http://goo.gl/mdFz56">Alonso Suarez</a>.
           </div>
           {% endblock %}
       </div>
@@ -43,7 +43,8 @@
     {% block js %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+    <script src="/static/js/angular.min.js"></script>
+    <script src="/static/js/app.js"></script>
     {% endblock%}
 </body>
 
