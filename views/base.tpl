@@ -19,10 +19,10 @@
       <div class="header">
         <nav>
           <ul class="nav nav-pills pull-right">
-            <li role="presentation" class="{% block addPage %}{% endblock%}"><a href="#">Add</a></li>
-            <li role="presentation" class="{% block updatePage %}{% endblock%}"><a href="#">Update</a></li>
-            <li role="presentation" class="{% block reportsPage %}{% endblock%}"><a href="#">Reports</a></li>
-            <li role="presentation" class="{% block logsPage %}{% endblock%}"><a href="#">Logs</a></li>
+            <li role="presentation" class="{% block addPage %}{% endblock%}"><a href="/add">Add</a></li>
+            <li role="presentation" class="{% block updatePage %}{% endblock%}"><a href="/update">Update</a></li>
+            <li role="presentation" class="{% block reportsPage %}{% endblock%}"><a href="/reports">Reports</a></li>
+            <li role="presentation" class="{% block logsPage %}{% endblock%}"><a href="/logs">Logs</a></li>
           </ul>
         </nav>
         <h3 class="text-muted">Suncor T/O</h3>
@@ -31,9 +31,12 @@
       <div class="jumbotron">
       {% block container %}{% endblock %}
       </div>
+      {% block details %}{% endblock %}
       <footer class="footer">
           {% block footer %}
-          &copy; Copyright 2015 by <a href="http://goo.gl/mdFz56">Alonso Suarez</a>.
+          <div class="pull-right">
+            &copy; Copyright 2015 by <a href="http://goo.gl/mdFz56">Alonso Suarez</a>.
+          </div>
           {% endblock %}
       </div>
     </div>
