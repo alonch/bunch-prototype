@@ -24,3 +24,11 @@ class Punch(ndb.Model):
     self.put()
     return self
 
+  @staticmethod
+  def getSystems():
+    punches = Punch.query(projection=["system"], distinct=True)
+    if punches is None:
+      return []
+
+    return [punch.system for punch in punches if punch.system is not None]
+

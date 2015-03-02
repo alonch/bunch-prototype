@@ -9,7 +9,7 @@
     <th>Attendance</th>
     <th>Responsible</th>
   </tr>
-  <tr ng-repeat="punch in getRecentPunches()">
+  <tr ng-repeat="punch in getPunches()">
     <td>{[{punch.id}]}</td>
     <td>{[{punch.system}]}</td>
     <td>{[{punch.tag}]}</td>

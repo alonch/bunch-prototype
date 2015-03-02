@@ -8,7 +8,7 @@ def datetime_default(obj):
       return obj.strftime("%d/%m/%y")
     
 class DefaultHandler(RequestHandler):
-  def get(self, ):
+  def get(self):
     pageTpl = env.get_template(self.tpl)
     self.response.write(pageTpl.render())
 
@@ -20,6 +20,14 @@ class AddHandler(DefaultHandler):
 
 class UpdateHandler(DefaultHandler):
   tpl = 'update.tpl'
+
+class SystemsHandler(RequestHandler):
+  def get(self):
+    pageTpl = env.get_template("update/systems.tpl")
+    data = {}
+    data['systems'] = db.Punch.getSystems()
+    html = pageTpl.render(data);
+    self.response.write(html)
 
 class PunchService(RequestHandler):
   def put(self):

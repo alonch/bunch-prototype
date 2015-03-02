@@ -1,4 +1,4 @@
-var app = angular.module('turnoverSuncor',[]);
+var app = angular.module('turnoverSuncor',['ui.bootstrap']);
 
 app.config(function($interpolateProvider){
     $interpolateProvider.startSymbol('{[{').endSymbol('}]}');
@@ -32,69 +32,71 @@ app.config(["$httpProvider", function ($httpProvider) {
     convertDateStringsToDates(responseData);
     return responseData;
   });
-  $httpProvider.defaults.transformRequest.unshift(function(requestData){
-    if (typeof requestData === "undefined"){
-      return requestData;
-    }
-    if (typeof requestData.getPrivateFields !== "function") { 
-      return requestData;
-    }
-    var fields = requestData.getPrivateFields();
-    for (var i in fields){
-      delete requestData[fields[i]];  
-    }
-    return requestData; 
-  });
 }]);
 
+app.factory('PunchFilter', ['$http', function($http) {
+  function PunchFilter(){
+    this.categories = {
+      a: true,
+      bsu: true,
+      bcc: true,
+      bcsu: true,
+      cbcc: true
+    };
+    this.statuses = {
+      open: true,
+      closed: true
+    };
+  }
+  PunchFilter.prototype = {
+
+  };
+  return PunchFilter;
+}]);
 
 app.factory('Punch', ['$http', function($http) {
-  function Punch(data) {
-      if (data) {
-          this.setData(data);
-      }
-      // Some other initializations related to Bunch
-    };
-    Punch.prototype = {
-      getPrivateFields: function(){
-        return ['statusText'];
-      },
-      setData: function(data) {
-          angular.extend(this, data);
-      },
-      save: function() {
-        var scope = this;
-        var promise = $http.put('/rest/punch', scope).
-          success(function(data, status, headers, config) {
-            scope.id = data.id;
-            scope.saved = true;
-          }).
-          error(function(data, status, headers, config) {
-            scope.id = -1;
-            scope.saved = false;
-          });
-        return promise;
-      },
-      statusText: function(text){
-        if (typeof(text) === "undefined"){
-          return this.status == true? "Open" : "Closed";
+  function Punch() {
+      // Some initializations related to Bunch
+  };
+  Punch.prototype = {
+    setData: function(data) {
+        angular.extend(this, data);
+    },
+    save: function() {
+      var scope = this;
+      var promise = $http.put('/rest/punch', scope).
+        success(function(data, status, headers, config) {
+          scope.id = data.id;
+          scope.saved = true;
+        }).
+        error(function(data, status, headers, config) {
+          scope.id = -1;
+          scope.saved = false;
+        });
+      return promise;
+    },
+    statusText: function(text){
+      if (typeof(text) === "undefined"){
+        if (typeof(this.status) === "undefined"){
+          return "";
         }
-        console.log(text);
-        this.status = text==="Open";
+        return this.status == true? "Open" : "Closed";
       }
-      // Some other methods related to Bunch
-    };
-    return Punch
+      this.status = text==="Open";
+    }
+    // Some other methods related to Bunch
+  };
+  return Punch
 }]);
 
 app.factory('bunchManager', ['$http', function($http) {
   var bunchManager = {
-    recentPunches: [],
-    getRecentPunches: function(){
-      return this.recentPunches
+    punches: [],
+    getPunches: function(){
+      return this.punches
     },
-    addRecentPunch: function(punch){
-      this.recentPunches.push(punch);
+    addPunch: function(punch){
+      this.punches.push(punch);
     }
   };
   return bunchManager;
@@ -107,30 +109,68 @@ app.directive('punchForm', function() {
   }
 });
 
-app.directive('punchDetails', function() {
+app.directive('punchFilterForm', function() {
   return {
     restrict: 'A',
-    templateUrl: '/static/html/punch-details.tpl'
+    templateUrl: '/static/html/punch-filter-form.tpl',
+    controller: ['$scope', '$modal', 'PunchFilter', function($scope, $modal, PunchFilter){
+      $scope.punchFilter = new PunchFilter();
+      $scope.checkAll = function(field){
+        changeChecks(field, true);
+      };
+      $scope.uncheckAll = function(field){
+        changeChecks(field, false);
+      };
+      function changeChecks(field, status){
+        var obj = $scope.punchFilter[field]
+        for(var key in obj){
+          obj[key] = status;
+        }
+      };
+      $scope.selectIDs = function(field){  
+        var modalInstance = $modal.open({
+          templateUrl: '/update/systems',
+          controller: 'systemsController'
+        })
+        modalInstance.result.then(function () {
+          console.log('modal finished');
+        });
+      };
+    }]
   }
 });
 
+app.directive('punchDetails', function() {
+  return {
+    restrict: 'A',
+    templateUrl: '/static/html/punch-details-table.tpl',
+    controller: ['$scope','bunchManager', function($scope, bunchManager){
+      $scope.getPunches = function(){
+        return bunchManager.getPunches();
+      };
+    }]
+  }
+});
 
 app.controller('punchController', ['$scope','Punch','bunchManager', function($scope, Punch, bunchManager) {
   $scope.punch = new Punch();
   $scope.save = function(){
-    bunchManager.addRecentPunch($scope.punch);
+    bunchManager.addPunch($scope.punch);
     $scope.punch.save();
     $scope.punch = new Punch();
-    $scope.statusText = "";
-  };
-  $scope.getRecentPunches = function(){
-    return bunchManager.getRecentPunches();
   };
   $scope.hasRecents = function(){
-    return bunchManager.getRecentPunches().length > 0
+    return bunchManager.getPunches().length > 0
+  }
+}]);
+
+app.controller('systemsController', ['$scope', '$modalInstance' , function($scope, $modalInstance){
+  $scope.systems = {}
+  console.log("systemsController");
+  $scope.showSystems= function(){
+    console.log($scope.systems);
   }
 }]);
 
 app.controller('punchUpdateController', ['$scope', function($scope){
-
 }]);

@@ -1,22 +1,14 @@
 {% extends "base.tpl" %}
-{% block head %}
-{{ super() }}
-<style type="text/css">
-.jumbotron{
-  padding-bottom: 80px;
-  padding-top: 1px;
-}
-h2{
-  text-align: left;
-}
-</style>
-{% endblock%}
 {% block title %}Add Punch{% endblock %}
 {% block addPage %}active{% endblock %}
 {% block containerController%}punchController{% endblock%}
 {% block container %}
-<h2>Punch:{{test}}</h2>
-<div punch-form></div>
+<h2>Punch</h2>
+<form class="form-horizontal" novalidate>
+  <div punch-form> </div>
+  <a href="/" class="btn btn-primary pull-left" role="button">Back</a>
+  <button class="btn btn-success pull-right" ng-click="save()">Save</button>
+</form>
 {% endblock %}
 {% block details %}
 <div ng-show="hasRecents()">
