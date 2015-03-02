@@ -20,6 +20,9 @@
       h2{
         text-align: left;
       }
+      .modal-open .modal{
+        background-color: rgba(0, 0, 0, 0.5);
+      }
     </style>
     {% endblock %}
 </head>

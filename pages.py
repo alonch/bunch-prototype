@@ -20,12 +20,15 @@ class AddHandler(DefaultHandler):
 
 class UpdateHandler(DefaultHandler):
   tpl = 'update.tpl'
-
-class SystemsHandler(RequestHandler):
-  def get(self):
-    pageTpl = env.get_template("update/systems.tpl")
+  find = {'systems':db.Punch.getSystems, 'tags':db.Punch.getTags}
+  def get(self, field=None):
+    if field is None:
+      DefaultHandler.get(self)
+      return
     data = {}
-    data['systems'] = db.Punch.getSystems()
+    pageTpl = env.get_template("update/ids.tpl")
+    data['ids'] = self.find[field]()
+    data['field'] = field[:-1]
     html = pageTpl.render(data);
     self.response.write(html)
 

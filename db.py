@@ -29,6 +29,11 @@ class Punch(ndb.Model):
     punches = Punch.query(projection=["system"], distinct=True)
     if punches is None:
       return []
-
     return [punch.system for punch in punches if punch.system is not None]
 
+  @staticmethod
+  def getTags():
+    punches = Punch.query(projection=["tag"], distinct=True)
+    if punches is None:
+      return []
+    return [punch.tag for punch in punches if punch.tag is not None]

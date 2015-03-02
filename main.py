@@ -29,6 +29,5 @@ app = webapp2.WSGIApplication([
   ('/', pages.MainHandler),
   ('/add', pages.AddHandler),
   ('/rest/punch', pages.PunchService),
-  ('/update', pages.UpdateHandler),
-  ('/update/systems', pages.SystemsHandler)
+  ('/update/?(systems|tags)?', pages.UpdateHandler)
 ], debug=True)

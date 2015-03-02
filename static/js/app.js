@@ -4,37 +4,18 @@ app.config(function($interpolateProvider){
     $interpolateProvider.startSymbol('{[{').endSymbol('}]}');
 });
 
-var regexIso8601 = /^(\d{4}|\+\d{6})(?:-(\d{2})(?:-(\d{2})(?:T(\d{2}):(\d{2}):(\d{2})\.(\d{1,})(Z|([\-+])(\d{2}):(\d{2}))?)?)?)?$/;
-function convertDateStringsToDates(input) {
-    // Ignore things that aren't objects.
-    if (typeof input !== "object") return input;
-
-    for (var key in input) {
-        if (!input.hasOwnProperty(key)) continue;
-
-        var value = input[key];
-        var match;
-        // Check for string properties which look like dates.
-        if (typeof value === "string" && (match = value.match(regexIso8601))) {
-            var milliseconds = Date.parse(match[0])
-            if (!isNaN(milliseconds)) {
-                input[key] = new Date(milliseconds);
-            }
-        } else if (typeof value === "object") {
-            // Recurse into object
-            convertDateStringsToDates(value);
-        }
-    }
-}
-
-app.config(["$httpProvider", function ($httpProvider) {
-  $httpProvider.defaults.transformResponse.push(function(responseData){
-    convertDateStringsToDates(responseData);
-    return responseData;
-  });
+app.factory('UIHelper', [function() {
+  return {
+    changeChecks: function(instance, field, status){
+      var obj = instance[field]
+      for(var key in obj){
+        obj[key] = status;
+      }
+    } 
+  };
 }]);
 
-app.factory('PunchFilter', ['$http', function($http) {
+app.factory('PunchFilter', [function() {
   function PunchFilter(){
     this.categories = {
       a: true,
@@ -48,9 +29,6 @@ app.factory('PunchFilter', ['$http', function($http) {
       closed: true
     };
   }
-  PunchFilter.prototype = {
-
-  };
   return PunchFilter;
 }]);
 
@@ -113,27 +91,22 @@ app.directive('punchFilterForm', function() {
   return {
     restrict: 'A',
     templateUrl: '/static/html/punch-filter-form.tpl',
-    controller: ['$scope', '$modal', 'PunchFilter', function($scope, $modal, PunchFilter){
+    controller: ['$scope', '$modal', 'PunchFilter', 'UIHelper', function($scope, $modal, PunchFilter, UIHelper){
       $scope.punchFilter = new PunchFilter();
       $scope.checkAll = function(field){
-        changeChecks(field, true);
+        UIHelper.changeChecks($scope.punchFilter, field, true);
       };
       $scope.uncheckAll = function(field){
-        changeChecks(field, false);
+        UIHelper.changeChecks($scope.punchFilter, field, false);
       };
-      function changeChecks(field, status){
-        var obj = $scope.punchFilter[field]
-        for(var key in obj){
-          obj[key] = status;
-        }
-      };
+      
       $scope.selectIDs = function(field){  
         var modalInstance = $modal.open({
-          templateUrl: '/update/systems',
+          templateUrl: '/update/'+field,
           controller: 'systemsController'
         })
-        modalInstance.result.then(function () {
-          console.log('modal finished');
+        modalInstance.result.then(function (ids) {
+          $scope.punchFilter[field] = ids;
         });
       };
     }]
@@ -164,12 +137,23 @@ app.controller('punchController', ['$scope','Punch','bunchManager', function($sc
   }
 }]);
 
-app.controller('systemsController', ['$scope', '$modalInstance' , function($scope, $modalInstance){
+app.controller('systemsController', ['$scope', '$modalInstance', 'UIHelper' , function($scope, $modalInstance, UIHelper){
   $scope.systems = {}
-  console.log("systemsController");
-  $scope.showSystems= function(){
-    console.log($scope.systems);
-  }
+  $scope.finish = function(){
+    var activeKeys = []
+    for( key in $scope.systems){ 
+      if($scope.systems[key]){ 
+        activeKeys.push(key); 
+      }
+    }
+    $modalInstance.close(activeKeys.join(", "));
+  };
+  $scope.cancel = function(){
+    $modalInstance.dismiss("cancel");
+  };
+  $scope.changeAll = function(on){
+    UIHelper.changeChecks($scope, "systems", on)
+  };
 }]);
 
 app.controller('punchUpdateController', ['$scope', function($scope){
