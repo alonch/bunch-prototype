@@ -19,11 +19,11 @@ h2{
   <div class="form-group">
     <label class="col-sm-2 control-label">System</label>
     <div class="col-sm-4">
-      <input ng-model="punch.system" type="text" class="form-control" placeholder="ID of the System">
+      <input ng-model="punch.system" type="number" class="form-control" placeholder="ID of the System">
     </div>
     <label for="tag" class="col-sm-2 control-label">Tag</label>
     <div class="col-sm-4">
-      <input ng-model="punch.tag" type="text" class="form-control" placeholder="ID of the Tag">
+      <input ng-model="punch.tag" type="number" class="form-control" placeholder="ID of the Tag">
     </div>
   </div>
   <div class="form-group">
@@ -39,7 +39,7 @@ h2{
     </div>
     <label class="col-sm-2 control-label">Status</label>
     <div class="col-sm-4">
-      <select ng-model="punch.status" class="form-control">
+      <select ng-model="statusText" class="form-control" ng-change="updateStatus()">
         <option>Open</option>
         <option>Closed</option>
       </select>
@@ -87,7 +87,7 @@ h2{
       <td>{[{punch.system}]}</td>
       <td>{[{punch.tag}]}</td>
       <td>{[{punch.category}]}</td>
-      <td>{[{punch.status}]}</td>
+      <td>{[{punch.getStatusText()}]}</td>
       <td>{[{punch.description}]}</td>
       <td>{[{punch.attendance}]}</td>
       <td>{[{punch.responsible}]}</td>
