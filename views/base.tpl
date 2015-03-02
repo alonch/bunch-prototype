@@ -14,7 +14,7 @@
     {% endblock %}
 </head>
 <body>
-    <div class="container">
+    <div class="container" ng-controller="{% block containerController %}{% endblock %}">
       {% block nav %}
       <div class="header">
         <nav>

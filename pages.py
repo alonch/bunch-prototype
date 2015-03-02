@@ -7,16 +7,19 @@ def datetime_default(obj):
     if isinstance(obj, datetime):
       return obj.strftime("%d/%m/%y")
     
+class DefaultHandler(RequestHandler):
+  def get(self, ):
+    pageTpl = env.get_template(self.tpl)
+    self.response.write(pageTpl.render())
 
-class MainHandler(RequestHandler):
-  def get(self):
-    tpl = env.get_template('index.tpl')
-    self.response.write(tpl.render())
+class MainHandler(DefaultHandler):
+  tpl = 'index.tpl'
 
-class AddHandler(RequestHandler):
-  def get(self):
-    tpl = env.get_template('add.tpl')
-    self.response.write(tpl.render())
+class AddHandler(DefaultHandler):
+  tpl = 'add.tpl'
+
+class UpdateHandler(DefaultHandler):
+  tpl = 'update.tpl'
 
 class PunchService(RequestHandler):
   def put(self):
