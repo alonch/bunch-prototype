@@ -73,8 +73,20 @@ app.factory('bunchManager', ['$http', function($http) {
     getPunches: function(){
       return this.punches
     },
-    addPunch: function(punch){
+    add: function(punch){
       this.punches.push(punch);
+    },
+    pullAll: function(){
+      var scope = this;
+      var promise = $http.get('/rest/punch', scope).
+        success(function(data, status, headers, config) {
+          scope.punches = data;
+        }).
+        error(function(data, status, headers, config) {
+          scope.punches = [];
+        });
+      return promise;
+    
     }
   };
   return bunchManager;
@@ -128,12 +140,16 @@ app.directive('punchDetails', function() {
 app.controller('punchController', ['$scope','Punch','bunchManager', function($scope, Punch, bunchManager) {
   $scope.punch = new Punch();
   $scope.save = function(){
-    bunchManager.addPunch($scope.punch);
+    bunchManager.add($scope.punch);
     $scope.punch.save();
     $scope.punch = new Punch();
   };
   $scope.hasRecents = function(){
     return bunchManager.getPunches().length > 0
+  }
+  $scope.refreshPunches = function(){
+    console.log("refreshed");
+    bunchManager.pullAll();
   }
 }]);
 
@@ -154,7 +170,4 @@ app.controller('systemsController', ['$scope', '$modalInstance', 'UIHelper' , fu
   $scope.changeAll = function(on){
     UIHelper.changeChecks($scope, "systems", on)
   };
-}]);
-
-app.controller('punchUpdateController', ['$scope', function($scope){
 }]);
