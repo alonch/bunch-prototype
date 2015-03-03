@@ -27,7 +27,8 @@
     {% endblock %}
 </head>
 <body>
-    <div class="container" ng-controller="{% block containerController %}{% endblock %}">
+    <div class="container" ng-controller="{% block containerController %}{% endblock %}" 
+                           ng-init="{% block containerInit %}{% endblock %}">
       {% block nav %}
       <div class="header">
         <nav>

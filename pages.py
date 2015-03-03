@@ -44,10 +44,12 @@ class PunchService(RequestHandler):
     data = json.loads(self.request.body)
     punch = db.Punch.save(data)
     json.dump(punch.to_dict(), self.response, default=datetime_default)
+    punch.key.delete()
 
   def get(self):
     punches = db.Punch.query()
     json.dump([punch.to_dict() for punch in punches], self.response, default=datetime_default)    
     
-
+  def post(self):
+    pass
 

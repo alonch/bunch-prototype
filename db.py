@@ -11,6 +11,12 @@ class Punch(ndb.Model):
   responsible = ndb.StringProperty()
   created = ndb.DateTimeProperty(auto_now_add=True)
   modified = ndb.DateTimeProperty(auto_now=True)
+  modifiedBy = ndb.StringProperty()
+
+  @staticmethod
+  def deleteAll():
+    for punch in Punch.query():
+      punch.key.delete()
 
   @staticmethod
   def getNextId():
