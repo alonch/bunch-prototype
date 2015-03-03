@@ -26,7 +26,7 @@ __builtin__.env = jinja2.Environment(
 import pages
 
 app = webapp2.WSGIApplication([
-  ('/', pages.MainHandler),
+  ('/(punches)?', pages.MainHandler),
   ('/add', pages.AddHandler),
   ('/rest/punch', pages.PunchService),
   ('/update/?(systems|tags)?', pages.UpdateHandler)

@@ -17,7 +17,7 @@
     {% endfor %}
   </div>
   <div class="panel-footer" style="height:66px;">
-    <button class="btn btn-primary btn-lg pull-left" ng-click="cancel()">Cancel</button>    
+    <button class="btn btn-danger btn-lg pull-left" ng-click="cancel()">Cancel</button>    
     <button class="btn btn-success btn-lg pull-right" ng-click="finish()">Select</button>
   </div>
 </div>

@@ -9,11 +9,18 @@ def datetime_default(obj):
     
 class DefaultHandler(RequestHandler):
   def get(self):
+    self.render()
+
+  def render(self, data={}):
     pageTpl = env.get_template(self.tpl)
-    self.response.write(pageTpl.render())
+    self.response.write(pageTpl.render(data))
 
 class MainHandler(DefaultHandler):
   tpl = 'index.tpl'
+  def get(self, page=None):
+    data = {}
+    data['main'] = page is None
+    self.render(data)
 
 class AddHandler(DefaultHandler):
   tpl = 'add.tpl'

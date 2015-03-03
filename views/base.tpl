@@ -32,10 +32,9 @@
       <div class="header">
         <nav>
           <ul class="nav nav-pills pull-right">
-            <li role="presentation" class="{% block addPage %}{% endblock%}"><a href="/add">Add</a></li>
-            <li role="presentation" class="{% block updatePage %}{% endblock%}"><a href="/update">Update</a></li>
-            <li role="presentation" class="{% block reportsPage %}{% endblock%}"><a href="/reports">Reports</a></li>
-            <li role="presentation" class="{% block logsPage %}{% endblock%}"><a href="/logs">Logs</a></li>
+            <li role="presentation" class="active"><a href="/punches"><b>Punches Database</b></a></li>
+            <li role="presentation" class="active"><a href="#"><b>Completion Logs</b></a></li>
+            <li role="presentation" class="active"><a href="#"><b>Audits</b></a></li>
           </ul>
         </nav>
         <h3 class="text-muted">Suncor T/O</h3>

@@ -67,6 +67,10 @@ app.factory('Punch', ['$http', function($http) {
   return Punch
 }]);
 
+app.factory('$', function(){ 
+  return $;
+});
+
 app.factory('bunchManager', ['$http', function($http) {
   var bunchManager = {
     punches: [],
@@ -137,7 +141,7 @@ app.directive('punchDetails', function() {
   }
 });
 
-app.controller('punchController', ['$scope','Punch','bunchManager', function($scope, Punch, bunchManager) {
+app.controller('punchController', ['$scope', '$', '$timeout','Punch','bunchManager', function($scope, $, $timeout, Punch, bunchManager) {
   $scope.punch = new Punch();
   $scope.save = function(){
     bunchManager.add($scope.punch);
@@ -148,8 +152,15 @@ app.controller('punchController', ['$scope','Punch','bunchManager', function($sc
     return bunchManager.getPunches().length > 0
   }
   $scope.refreshPunches = function(){
-    console.log("refreshed");
-    bunchManager.pullAll();
+    bunchManager
+      .pullAll()
+        .then(function(){
+          $timeout(function(){
+            $('html, body').animate({
+              scrollTop: $('#punches').offset().top
+            }, 2000); 
+          },0,false);
+        });
   }
 }]);
 
