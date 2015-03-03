@@ -11,6 +11,7 @@ import pages
 app = webapp2.WSGIApplication([
   ('/(punches)?', pages.MainHandler),
   ('/add', pages.AddHandler),
+  ('/reports', pages.ReportsHandler),
   ('/rest/punch', pages.PunchService),
   ('/update/?(systems|tags)?', pages.UpdateHandler)
 ], debug=True)

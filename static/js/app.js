@@ -34,6 +34,8 @@ app.factory('PunchFilter', [function() {
 
 app.factory('Punch', ['$http', function($http) {
   function Punch(data) {
+      this.status = true;
+      this.category = "A";
       if (data){
         this.setData(data)
       }
@@ -171,9 +173,15 @@ app.directive('punchDetails', function() {
 app.controller('punchController', ['$scope', '$', '$timeout','Punch','bunchManager', function($scope, $, $timeout, Punch, bunchManager) {
   $scope.punch = new Punch();
   $scope.setPunchesModifiable = function(on){
-    console.log("hello from changing modifiable");
     bunchManager.modifiable = on;
-  }
+  };
+  $scope.setPunches = function(data){
+    for(key in data){
+      var obj = new Punch(data[key]);
+      obj.$scope = $scope;
+      bunchManager.add(obj);
+    }
+  };
   $scope.save = function(){
     bunchManager.add($scope.punch);
     $scope.punch.modifiedBy = $scope.getUser();
@@ -184,7 +192,13 @@ app.controller('punchController', ['$scope', '$', '$timeout','Punch','bunchManag
     return bunchManager.getPunches().length > 0
   };
   $scope.getUser = function(){
-      return "SM";//TODO dialog
+    return "SM";//TODO dialog
+  };
+  $scope.printPunches = function(){
+    $("<iframe>")                             
+        .hide()
+        .attr("src", "/rest/punch?output=html")
+        .appendTo("body"); 
   };
   $scope.refreshPunches = function(){
     bunchManager

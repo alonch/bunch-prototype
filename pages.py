@@ -39,7 +39,10 @@ class UpdateHandler(DefaultHandler):
     html = pageTpl.render(data);
     self.response.write(html)
 
-class PunchService(RequestHandler):
+class ReportsHandler(DefaultHandler):
+  tpl = 'reports.tpl'
+
+class PunchService(DefaultHandler):
   def put(self):
     data = json.loads(self.request.body)
     punch = db.Punch.save(data)
@@ -47,9 +50,28 @@ class PunchService(RequestHandler):
     punch.key.delete()
 
   def get(self):
+    process = {'json':self.getJson, 'html':self.getHtml}
+    output = self.request.get("output", "json")
+    process[output]()
+
+  def getJson(self):
     punches = db.Punch.query()
     json.dump([punch.to_dict() for punch in punches], self.response, default=datetime_default)    
-    
-  def post(self):
-    pass
+  
+  def getHtml(self):
+    self.tpl = 'report.tpl'
+    data = {}
+    punches = db.Punch.query()
+    data['punches']= json.dumps([punch.to_dict() for punch in punches], default=datetime_default)      
+    self.render(data)
 
+  def post(self):
+    data = json.loads(self.request.body)
+    punch = db.Punch.query(db.Punch.id==data['id']).get()
+    punch.status = data['status']
+    punch.modifiedBy = data['modifiedBy']
+    #punch.put()
+    #json.dump(punch.to_dict(), self.response, default=datetime_default)
+    
+
+  

@@ -27,6 +27,7 @@
     {% endblock %}
 </head>
 <body>
+    {% block body %}
     <div class="container" ng-controller="{% block containerController %}{% endblock %}" 
                            ng-init="{% block containerInit %}{% endblock %}">
       {% block nav %}
@@ -53,6 +54,7 @@
           {% endblock %}
       </div>
     </div>
+    {% endblock %}
     {% block js %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
@@ -60,7 +62,13 @@
     <script src="/static/js/ui-bootstrap-tpls-0.12.1.min.js"></script>
     <script src="/static/js/app.js"></script>
     {% endblock%}
+    
 </body>
-
-
-<!-- Latest compiled and minified JavaScript -->
+<script type="text/javascript">
+  $(document).ready(function () {
+    setTimeout(function(){
+      {% block onReady %}{% endblock %}  
+    },200);
+    
+  });
+</script>
