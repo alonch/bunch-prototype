@@ -9,10 +9,10 @@
       <button class="btn" ng-click="changeAll(false)">Uncheck All</button>
     </div>
     <div class="clearfix"></div>
-    {% for id in ids %}
+    {% for i in range(ids|count) %}
     <div class="col-sm-9 col-sm-offset-3 checkbox">
-      <input ng-model="systems['{{id}}']" type="checkbox" class="btn" ng-init="systems['{{id}}']=true">
-      {{id}} - {{field}} Name
+      <input ng-model="systems['{{ids[i]}}']" type="checkbox" class="btn" ng-init="systems['{{ids[i]}}']=true">
+      {{ids[i]}} - {{names[i]}}
     </div>
     {% endfor %}
   </div>

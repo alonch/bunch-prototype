@@ -32,7 +32,7 @@ app.factory('PunchFilter', [function() {
   return PunchFilter;
 }]);
 
-app.factory('Punch', ['$http', function($http) {
+app.factory('Punch', ['$http', '$q', function($http, $q) {
   function Punch(data) {
       this.status = true;
       this.category = "A";
@@ -43,14 +43,20 @@ app.factory('Punch', ['$http', function($http) {
   Punch.prototype = {
     close: function(){
       var scope = this;
-      scope.status = false;
-      scope.modifiedBy = scope.$scope.getUser();
-      var promise = $http.post('/rest/punch', scope).
-        success(function(data, status, headers, config) {
-        }).
-        error(function(data, status, headers, config) {
-          scope.status = true;
-        });
+      promise =  $q(function(resolve, reject){
+        scope.$scope.getUser(function(user){
+          scope.modifiedBy = user;
+          scope.status = false;
+          $http.post('/rest/punch', scope).
+            success(function(data, status, headers, config) {
+              resolve();
+            }).
+            error(function(data, status, headers, config) {
+              scope.status = true;
+              reject()
+            });
+        });  
+      }); 
       return promise;
     },
     setData: function(data) {
@@ -105,6 +111,7 @@ app.factory('bunchManager', ['$http', 'Punch', function($http, Punch) {
       var scope = this;
       var promise = $http.get('/rest/punch', scope).
         success(function(data, status, headers, config) {
+          scope.punches = [];
           for(key in data){
             var obj = new Punch(data[key]);
             obj.$scope = $scope;
@@ -127,7 +134,6 @@ app.directive('punchForm', function() {
     templateUrl: '/static/html/punch-form.tpl'
   }
 });
-
 
 app.directive('punchFilterForm', function() {
   return {
@@ -170,7 +176,7 @@ app.directive('punchDetails', function() {
   }
 });
 
-app.controller('punchController', ['$scope', '$', '$timeout','Punch','bunchManager', function($scope, $, $timeout, Punch, bunchManager) {
+app.controller('punchController', ['$scope', '$', '$timeout', '$modal','Punch','bunchManager', function($scope, $, $timeout, $modal, Punch, bunchManager) {
   $scope.punch = new Punch();
   $scope.setPunchesModifiable = function(on){
     bunchManager.modifiable = on;
@@ -184,21 +190,38 @@ app.controller('punchController', ['$scope', '$', '$timeout','Punch','bunchManag
   };
   $scope.save = function(){
     bunchManager.add($scope.punch);
-    $scope.punch.modifiedBy = $scope.getUser();
-    $scope.punch.save();
-    $scope.punch = new Punch();
+    $scope.getUser(function(user){
+      $scope.punch.modifiedBy = user;
+      $scope.punch.save();
+      $scope.punch = new Punch();  
+    });
   };
   $scope.hasRecents = function(){
     return bunchManager.getPunches().length > 0
   };
-  $scope.getUser = function(){
+  $scope.getUser = function(fn){
+    var modalInstance = $modal.open({
+      templateUrl: '/static/html/login.tpl',
+      controller: 'systemsController'
+    });
+    modalInstance.result.then(function (user) {
+      fn(user);
+    });
     return "SM";//TODO dialog
   };
   $scope.printPunches = function(){
+    if (detectIE()){
+      var win = window.open("/rest/punch?output=html",'_blank', 'toolbar=no,status=no,menubar=no,scrollbars=no,resizable=no,left=-10000, top=-10000, width=1, height=1, visible=none', '');
+      setTimeout(function(){
+        win.close();
+      },1000);
+      return;
+    }
     $("<iframe>")                             
         .hide()
         .attr("src", "/rest/punch?output=html")
-        .appendTo("body"); 
+        .appendTo("body");
+    
   };
   $scope.refreshPunches = function(){
     bunchManager
@@ -230,4 +253,7 @@ app.controller('systemsController', ['$scope', '$modalInstance', 'UIHelper' , fu
   $scope.changeAll = function(on){
     UIHelper.changeChecks($scope, "systems", on)
   };
+  $scope.login = function(){
+    $modalInstance.close($scope.user);
+  }
 }]);

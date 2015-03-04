@@ -28,6 +28,8 @@ class AddHandler(DefaultHandler):
 class UpdateHandler(DefaultHandler):
   tpl = 'update.tpl'
   find = {'systems':db.Punch.getSystems, 'tags':db.Punch.getTags}
+  names ={'systems':['Civil Structural', '480 KV', 'Instrument Air', 'Gas', 'Building', 'Electrical Cables'],
+          'tags':['Cables', 'Piping', "Valves", "PT's", 'Instruments']}
   def get(self, field=None):
     if field is None:
       DefaultHandler.get(self)
@@ -35,7 +37,7 @@ class UpdateHandler(DefaultHandler):
     data = {}
     pageTpl = env.get_template("update/ids.tpl")
     data['ids'] = self.find[field]()
-    data['field'] = field[:-1]
+    data['names'] = self.names[field]
     html = pageTpl.render(data);
     self.response.write(html)
 
@@ -47,10 +49,12 @@ class PunchService(DefaultHandler):
     data = json.loads(self.request.body)
     punch = db.Punch.save(data)
     json.dump(punch.to_dict(), self.response, default=datetime_default)
-    punch.key.delete()
+    #punch.key.delete()
 
   def get(self):
-    process = {'json':self.getJson, 'html':self.getHtml}
+    process = {'json':self.getJson, 
+              'html':self.getHtml, 
+              'delete':self.getDelete}
     output = self.request.get("output", "json")
     process[output]()
 
@@ -65,13 +69,20 @@ class PunchService(DefaultHandler):
     data['punches']= json.dumps([punch.to_dict() for punch in punches], default=datetime_default)      
     self.render(data)
 
+  def getDelete(self):
+    db.Punch.deleteAll()
+
   def post(self):
     data = json.loads(self.request.body)
     punch = db.Punch.query(db.Punch.id==data['id']).get()
     punch.status = data['status']
     punch.modifiedBy = data['modifiedBy']
-    #punch.put()
+    punch.put()
     #json.dump(punch.to_dict(), self.response, default=datetime_default)
     
+  class LoginHandler(DefaultHandler):
+    
+    def get(self):
+      pass
 
   
